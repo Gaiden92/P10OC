@@ -18,11 +18,13 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
 
-from api.views import UserViewSet, ProjectViewSet
+from api.views import UserViewSet, ProjectViewSet, IssueViewSet, CommentViewSet
 
 router = routers.SimpleRouter()
 router.register('user', UserViewSet, basename='user')
 router.register('project', ProjectViewSet, basename='project')
+router.register('issue', IssueViewSet, basename='issue')
+router.register('comment', CommentViewSet, basename='comment')
 
 urlpatterns = [
     path("admin/", admin.site.urls),

@@ -39,7 +39,7 @@ class Project(models.Model):
 class Contributor(models.Model):
     created_time = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    Project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='contributors')
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='contributors')
 
     def __str__(self) -> str:
         return self.user

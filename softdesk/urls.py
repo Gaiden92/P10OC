@@ -18,16 +18,22 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
 
-from api.views import UserViewSet, ProjectViewSet, IssueViewSet, CommentViewSet
+from authentication.views import UserViewSet, UserLoginAPIView, UserTokenRefreshAPIView
+from api.views import ProjectViewSet, IssueViewSet, CommentViewSet, ContributorViewSet
+
 
 router = routers.SimpleRouter()
+
 router.register('user', UserViewSet, basename='user')
 router.register('project', ProjectViewSet, basename='project')
 router.register('issue', IssueViewSet, basename='issue')
 router.register('comment', CommentViewSet, basename='comment')
+router.register('contributor', ContributorViewSet, basename='contributor')
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("api/", include(router.urls)),
+    path('api/login/', UserLoginAPIView.as_view(), name='token-obtain-pair'),
+    path('api/token-refresh/', UserTokenRefreshAPIView.as_view(), name='token-refresh'),
     path('api-auth/', include('rest_framework.urls')),
-    path("api/", include(router.urls))
 ]

@@ -1,20 +1,21 @@
 from rest_framework import serializers
 
-from api.models import User, Project, Issue, Comment
+from api.models import Project, Issue, Comment, Contributor
 
-class UserSerializer(serializers.ModelSerializer):
 
+class ContributorSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = ["id",
-        "created_time",
-        "username",
-        "age",
-        "can_be_contacted",
-        "can_data_be_shared"
-        ]
+        model = Contributor
+        fields = [
+            "id",
+            "created_time",
+            "user",
+            "project"
+            ]
+
 
 class ProjectSerializer(serializers.ModelSerializer):
+    contributors = ContributorSerializer(many=True, read_only=True)
     class Meta:
         model = Project
         fields = [
@@ -23,9 +24,16 @@ class ProjectSerializer(serializers.ModelSerializer):
             "title",
             "project_type",
             "author",
-            "description"
+            "description",
+            "contributors"
             ]
-        
+
+    def create(self, validated_data):
+        project = Project(**validated_data)
+        project.save()
+        return project
+
+
 class IssueSerializer(serializers.ModelSerializer):
     class Meta:
         model= Issue

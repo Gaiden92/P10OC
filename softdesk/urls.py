@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
-from rest_framework_nested import routers
+from rest_framework_nested import routers as n_routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from authentication.views import UserViewSet
 from api.views import ProjectViewSet, IssueViewSet, CommentViewSet, ContributorViewSet
@@ -25,18 +25,25 @@ from api.views import ProjectViewSet, IssueViewSet, CommentViewSet, ContributorV
 
 router = routers.SimpleRouter()
 
-router.register('user', UserViewSet, basename='user')
-router.register('project', ProjectViewSet, basename='project')
-router.register('issue', IssueViewSet, basename='issue')
-router.register('comment', CommentViewSet, basename='comment')
-router.register('contributor', ContributorViewSet, basename='project')
+router.register('users', UserViewSet, basename='users')
+router.register(r'projects', ProjectViewSet, basename='projects')
+router.register('issues', IssueViewSet, basename='issues')
+router.register('comments', CommentViewSet, basename='comments')
+router.register('contributors', ContributorViewSet, basename='projects')
 
+project_router = n_routers.NestedSimpleRouter(router, r'projects', lookup='project')
+project_router.register(r"contributors", ContributorViewSet, basename="projects")
+project_router.register(r'issues', IssueViewSet, basename='project-issues')
 
+issue_router = n_routers.NestedSimpleRouter(project_router, r'issues', lookup='issue')
+issue_router.register(r'comments', CommentViewSet, basename='issue-comments')
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/", include(router.urls)),
+    path('api-auth/', include('rest_framework.urls')),
     path('api/login/', TokenObtainPairView.as_view(), name='token-obtain-pair'),
     path('api/token-refresh/', TokenRefreshView.as_view(), name='token-refresh'),
-    path('api-auth/', include('rest_framework.urls')),
+    path("api/", include(router.urls)),
+    path('api/', include(project_router.urls)),
+    path('api/', include(issue_router.urls))
 ]

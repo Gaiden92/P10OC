@@ -29,6 +29,3 @@ class IsAuthorOrReadOnly(permissions.BasePermission):
         # Seul l'auteur du projet peut effectuer des opérations sur les contributeurs
         return obj.project.author == request.user
 
-
-
-

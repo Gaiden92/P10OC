@@ -35,11 +35,14 @@ class IssueViewSet(ModelViewSet):
     # permission_classes = [IsAuthorOrReadOnly]
 
     def get_queryset(self):
-        return Issue.objects.all()
+        issues = Issue.objects.filter(project=self.kwargs['project_pk'])
+        return issues
 
     
 class CommentViewSet(ModelViewSet):
     serializer_class = CommentSerializer
 
     def get_queryset(self):
-        return Comment.objects.all()
+        comments = Comment.objects.filter(issue=self.kwargs['issue_pk'])
+        return comments
+

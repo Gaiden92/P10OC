@@ -1,5 +1,5 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-from rest_framework.fields import empty
 
 from api.models import Project, Issue, Comment, Contributor
 
@@ -19,22 +19,16 @@ class ProjectSerializer(serializers.ModelSerializer):
     contributors = ContributorSerializer(many=True, read_only=True)
     class Meta:
         model = Project
-        fields = [
-            "id",
-            "created_time",
-            "title",
-            "project_type",
-            "author",
-            "description",
-            "contributors"
-            ]
+        fields = '__all__'
+        extra_fields = 'contributors'
+        read_only_fields = ["author"]
 
     def create(self, validated_data):
         project = Project(**validated_data)
         project.save()
         contributor = Contributor(user=project.author, project=project)
         contributor.save()
-        
+
         return project
 
 
@@ -42,29 +36,19 @@ class IssueSerializer(serializers.ModelSerializer):
     
     class Meta:
         model= Issue
-        fields = [
-            "id",
-            "created_time",
-            "title",
-            "description",
-            "project",
-            "priority",
-            "tag",
-            "status",
-            "assign_to",
-            "author"
-            ]
-        
+        fields = "__all__"
+        read_only_fields  = ["author"]
+
+
+    def create(self, validated_data):
+        issue = Issue(**validated_data)
+        project_pk = self.context.get('view').kwargs.get('project_pk')
+        issue.project = project_pk
+        issue.save()
+  
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = [
-            "id",
-            "created_time",
-            "issue",
-            "text",
-            "author",
-            "link_to_issue",
-            "uuid"
-            ]
+        fields = "__all__"
+        read_only_fields = ["title", "author", "link_to_issue", "issue"]

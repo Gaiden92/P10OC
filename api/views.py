@@ -11,15 +11,15 @@ class ProjectViewSet(ModelViewSet):
     def get_queryset(self):
         return Project.objects.all()
 
-    # def get_permissions(self):
-    #     if self.action in ['list', 'retrieve']:
-    #         permission_classes = [AllowAny]
-    #     elif self.action in ['create']:
-    #         permission_classes = [IsAuthenticated]
-    #     else:
-    #         permission_classes = [IsAuthor]
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            permission_classes = [AllowAny]
+        elif self.action in ['create']:
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [IsAuthor]
 
-    #     return [permission() for permission in permission_classes]
+        return [permission() for permission in permission_classes]
 
 
 class ContributorViewSet(ModelViewSet):

@@ -4,6 +4,14 @@ from rest_framework import permissions
 from rest_framework import generics
 from .models import Project
 
+class IsContributorOfProject(permissions.BasePermission):
+
+    def has_permission(self, request, view):
+        project = generics.get_object_or_404(Project, pk=view.get('project_pk'))
+        print(project)
+        if request.method in permissions.SAFE_METHODS:
+            return True if request.user in project.contributors else False
+
 
 class IsAuthor(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):

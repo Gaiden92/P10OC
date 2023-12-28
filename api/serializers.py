@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.fields import empty
 
 from api.models import Project, Issue, Comment, Contributor
 
@@ -31,10 +32,14 @@ class ProjectSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         project = Project(**validated_data)
         project.save()
+        contributor = Contributor(user=project.author, project=project)
+        contributor.save()
+        
         return project
 
 
 class IssueSerializer(serializers.ModelSerializer):
+    
     class Meta:
         model= Issue
         fields = [
@@ -49,6 +54,7 @@ class IssueSerializer(serializers.ModelSerializer):
             "assign_to",
             "author"
             ]
+        
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:

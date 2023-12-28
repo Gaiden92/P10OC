@@ -30,8 +30,11 @@ class Contributor(models.Model):
     user = models.ForeignKey(AUTH_USER_MODEL, on_delete=models.CASCADE)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='contributors')
 
+    class Meta:
+        unique_together = ('user', 'project')
+
     def __str__(self) -> str:
-        return self.user
+         return self.user.username
 
 
 class Issue(models.Model):
@@ -50,7 +53,7 @@ class Issue(models.Model):
         ("IN_PROGRESS", "In progress"),
         ("FINISHED", "Finished")
     )
-
+    
     created_time = models.DateTimeField(auto_now_add=True)
     title = models.CharField(max_length=255)
     description = models.TextField()

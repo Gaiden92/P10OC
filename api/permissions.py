@@ -14,13 +14,13 @@ class IsAuthor(permissions.BasePermission):
 class IsAuthorOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
         # Autoriser les requêtes GET, HEAD ou OPTIONS
-        if request.method in ['GET', 'HEAD', 'OPTIONS']:
+        if request.method in permissions.SAFE_METHODS:
             return True
 
         # Autoriser les requêtes POST, PUT, PATCH ou DELETE seulement pour les auteurs du projet
-        project_id = request.data.get('project', None)
-        if project_id:
-            project = Project.objects.get(pk=project_id)
+        project_pk = request.data.get('project', None)
+        if project_pk:
+            project = Project.objects.get(pk=project_pk)
             return project.author == request.user
 
         return False

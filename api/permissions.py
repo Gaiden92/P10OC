@@ -1,20 +1,15 @@
-from django.core.exceptions import ObjectDoesNotExist
-
 from rest_framework import permissions
-from rest_framework import generics
 from .models import Project
-
-class IsContributorOfProject(permissions.BasePermission):
-
-    def has_permission(self, request, view):
-        project = generics.get_object_or_404(Project, pk=view.get('project_pk'))
-        print(project)
-        if request.method in permissions.SAFE_METHODS:
-            return True if request.user in project.contributors else False
 
 
 class IsAuthor(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            #Vérifie si l'utilisateur est un contributeur au projet
+            if request.user in obj.contributors:
+                return True
+            else:
+                return False
         # Vérifie si l'utilisateur est l'auteur de l'objet
         return obj.author == request.user
 
@@ -22,7 +17,7 @@ class IsAuthor(permissions.BasePermission):
 class IsAuthorOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
         # Autoriser les requêtes GET, HEAD ou OPTIONS
-        if request.method in permissions.SAFE_METHODS:
+        if request.method in permissions.SAFE_METHODS and request.user.is_authenticated:
             return True
 
         # Autoriser les requêtes POST, PUT, PATCH ou DELETE seulement pour les auteurs du projet

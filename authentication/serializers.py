@@ -21,6 +21,11 @@ class UserSerializer(serializers.ModelSerializer):
         if self.instance:
             self.fields.pop('password')
             
+    def create(self, validated_data):
+        user = User.objects.create(**validated_data)
+        user.set_password(validated_data["password"])
+        user.save()
+        return user
 
 class UserLoginSerializer(serializers.Serializer):
     username = serializers.CharField()

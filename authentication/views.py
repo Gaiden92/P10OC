@@ -7,7 +7,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from authentication.serializers import UserSerializer, UserLoginSerializer
 from authentication.models import User
-
+from authentication.permissions import isOwner
 
 class UserViewSet(ModelViewSet):
     serializer_class = UserSerializer
@@ -19,7 +19,7 @@ class UserViewSet(ModelViewSet):
         if self.action in ['list', 'retrieve', 'create']:
             permission_classes = [AllowAny]
         else:
-            permission_classes = [IsAuthenticated]
+            permission_classes = [isOwner]
 
         return [permission() for permission in permission_classes]
 

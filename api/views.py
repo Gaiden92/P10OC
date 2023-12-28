@@ -7,14 +7,12 @@ from api.permissions import IsAuthor, IsAuthorOrReadOnly
 
 class ProjectViewSet(ModelViewSet):
     serializer_class = ProjectSerializer
-    
+
     def get_queryset(self):
         return Project.objects.all()
 
     def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
-            permission_classes = [AllowAny]
-        elif self.action in ['create']:
+        if self.action in ['list', 'retrieve','create']:
             permission_classes = [IsAuthenticated]
         else:
             permission_classes = [IsAuthor]
@@ -24,11 +22,11 @@ class ProjectViewSet(ModelViewSet):
 
 class ContributorViewSet(ModelViewSet):
     serializer_class = ContributorSerializer
-    # permission_classes = [IsAuthorOrReadOnly]
-
+    permission_classes = [IsAuthorOrReadOnly]
+    
     def get_queryset(self):
         return Contributor.objects.all()
-    
+
 
 class IssueViewSet(ModelViewSet):
     serializer_class = IssueSerializer
@@ -38,7 +36,7 @@ class IssueViewSet(ModelViewSet):
         issues = Issue.objects.filter(project=self.kwargs['project_pk'])
         return issues
 
-    
+
 class CommentViewSet(ModelViewSet):
     serializer_class = CommentSerializer
 

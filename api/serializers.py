@@ -4,6 +4,11 @@ from api.models import Project, Issue, Comment, Contributor
 
 
 class ContributorSerializer(serializers.ModelSerializer):
+    """A class representation of a contributor serializer.
+
+    Arguments:
+        serializers -- class ModelSerializer
+    """
     class Meta:
         model = Contributor
         fields = [
@@ -15,6 +20,13 @@ class ContributorSerializer(serializers.ModelSerializer):
 
 
 class ProjectSerializer(serializers.ModelSerializer):
+    """A class representation of a contributor serializer.
+
+    Arguments:
+        serializers -- class ModelSerializer
+    Returns:
+        None
+    """
     contributors = ContributorSerializer(many=True, read_only=True)
 
     class Meta:
@@ -23,7 +35,15 @@ class ProjectSerializer(serializers.ModelSerializer):
         extra_fields = 'contributors'
         read_only_fields = ["author", "id"]
 
-    def create(self, validated_data):
+    def create(self, validated_data: list) -> object:
+        """Method to create a project instance.
+
+        Arguments:
+            validated_data -- list: data
+
+        Returns:
+            obj: a project object
+        """
         request = self.context.get('request', None)
         if request:
             user = request.user
@@ -42,13 +62,25 @@ class ProjectSerializer(serializers.ModelSerializer):
 
 
 class IssueSerializer(serializers.ModelSerializer):
+    """A class representation of a issue serializer.
 
+    Arguments:
+        serializers -- class ModelSerializer
+    """
     class Meta:
         model = Issue
         fields = "__all__"
         read_only_fields = ["author", "id"]
 
-    def create(self, validated_data):
+    def create(self, validated_data: list) -> object:
+        """Method to create a issue instance.
+
+        Arguments:
+            validated_data -- list: data
+
+        Returns:
+            obj: a issue object
+        """
         project = Project.objects.get(
             id=self.context['view'].kwargs['project_pk']
             )
@@ -70,11 +102,24 @@ class IssueSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    """A class representation of a comment serializer.
+
+    Arguments:
+        serializers -- class ModelSerializer
+    """
     class Meta:
         model = Comment
         fields = "__all__"
 
-    def create(self, validated_data):
+    def create(self, validated_data: list) -> object:
+        """Method to create a comment instance.
+
+        Arguments:
+            validated_data -- list: data
+
+        Returns:
+            obj: a comment object
+        """
         issue = Issue.objects.get(id=self.context['view'].kwargs['issue_pk'])
         request = self.context.get('request', None)
         if request:

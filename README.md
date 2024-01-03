@@ -23,18 +23,21 @@ Dans Windows Powershell, naviguer vers le dossier souhaité.
 git clone https://github.com/Gaiden92/P10OC.git
 ```
 
-###### • Activer l'environnement virtuel
+###### • Créer et activer un environnement virtuel
 
 ```
-cd softdesk 
+
 python -m venv env 
 env\Scripts\activate
 ```
 
-###### • Installer les paquets requis
+###### • Installer poetry et les paquets requis
 
 ```
-pip install -r requirements.txt
+pip install poetry
+poetry shell (activation de l'environnement virtuel)
+poetry install (installation des paquets requis)
+
 ```
 
 
@@ -45,16 +48,18 @@ Dans le terminal, naviguer vers le dossier souhaité.
 git clone https://github.com/Gaiden92/P10OC.git
 ```
 
-###### • Activer l'environnement virtuel
+###### • Créer et activer un environnement virtuel
 ```
-cd softdesk 
 python3 -m venv env 
 source env/bin/activate
 ```
 
 ###### • Installer les paquets requis
 ```
-pip install -r requirements.txt
+pip install poetry
+poetry shell (activation de l'environnement virtuel)
+poetry install (installation des paquets requis)
+
 ```
 
 ## Utilisation

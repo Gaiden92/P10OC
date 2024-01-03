@@ -36,7 +36,8 @@ class ContributorViewSet(ModelViewSet):
     permission_classes = [IsAuthorOrReadOnly]
 
     def get_queryset(self):
-        return Contributor.objects.all()
+        contributors = Contributor.objects.filter(project=self.kwargs['project_pk'])
+        return contributors
 
 
 class IssueViewSet(ModelViewSet):
@@ -63,10 +64,10 @@ class CommentViewSet(ModelViewSet):
         return comments
 
 
-def get_permissions(self):
-    if self.action in ['list', 'retrieve', 'create']:
-        permission_classes = [IsAuthenticated & IsContributorForComment,]
-    else:
-        permission_classes = [IsAuthorOfComment]
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve', 'create']:
+            permission_classes = [IsAuthenticated & IsContributorForComment,]
+        else:
+            permission_classes = [IsAuthenticated & IsAuthorOfComment]
 
-    return [permission() for permission in permission_classes]
+        return [permission() for permission in permission_classes]

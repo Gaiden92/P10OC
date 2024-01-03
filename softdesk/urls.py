@@ -32,13 +32,6 @@ router = routers.SimpleRouter()
 
 router.register('users', UserViewSet, basename='users')
 router.register(r'projects', ProjectViewSet, basename='projects')
-router.register('issues', IssueViewSet, basename='issues')
-router.register('comments',
-                CommentViewSet,
-                basename='comments')
-router.register('contributors',
-                ContributorViewSet,
-                basename='contributors')
 
 project_router = n_routers.NestedSimpleRouter(router,
                                               r'projects',

@@ -12,8 +12,8 @@ class IsAuthor(permissions.BasePermission):
 class IsAuthorOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
         # Autoriser les requêtes GET, HEAD ou OPTIONS
-        if request.method in (permissions.SAFE_METHODS and
-                              request.user.is_authenticated):
+        if request.method in permissions.SAFE_METHODS and \
+                              request.user.is_authenticated:
             return True
 
         project_pk = request.data.get('project', None)

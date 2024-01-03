@@ -6,16 +6,20 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('api', '0013_alter_issue_assign_to_alter_issue_project'),
+        ("api", "0013_alter_issue_assign_to_alter_issue_project"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='project',
-            name='author',
-            field=models.ForeignKey(blank=True, on_delete=django.db.models.deletion.CASCADE, related_name='authored_projects', to=settings.AUTH_USER_MODEL),
+            model_name="project",
+            name="author",
+            field=models.ForeignKey(
+                blank=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="authored_projects",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

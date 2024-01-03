@@ -6,12 +6,18 @@ from .models import Project, Contributor
 
 class IsAuthor(permissions.BasePermission):
     """A class that reprensents a permission to check if the current
-    user is the author of the project. 
+    user is the author of the project.
 
     Arguments:
         permissions -- a class BasePermission
     """
-    def has_object_permission(self, request: str, view: object, obj: object) -> bool:
+
+    def has_object_permission(
+            self,
+            request: str,
+            view: object,
+            obj: object
+    ) -> bool:
         """Method to check if the current
         user is the author of the project.
 
@@ -33,7 +39,12 @@ class IsAuthorOrReadOnly(permissions.BasePermission):
     Arguments:
         permissions -- A class BasePermission
     """
-    def has_permission(self, request: str, view: object) -> bool:
+
+    def has_permission(
+            self,
+            request: str,
+            view: object
+    ) -> bool:
         """A method to check if current user
         is the author of the project.
 
@@ -44,11 +55,11 @@ class IsAuthorOrReadOnly(permissions.BasePermission):
         Returns:
             bool
         """
-        if request.method in permissions.SAFE_METHODS and \
-                              request.user.is_authenticated:
+        if request.method in permissions.SAFE_METHODS \
+                and request.user.is_authenticated:
             return True
 
-        project_pk = request.data.get('project', None)
+        project_pk = request.data.get("project", None)
         if project_pk:
             project = Project.objects.get(pk=project_pk)
             return project.author == request.user
@@ -66,7 +77,7 @@ class IsAuthorOrReadOnly(permissions.BasePermission):
 
         Returns:
             bool
-        """        
+        """
 
         return obj.project.author == request.user
 
@@ -78,6 +89,7 @@ class IsContributor(permissions.BasePermission):
     Arguments:
         permissions -- A class BasePermission
     """
+
     def has_object_permission(self, request: str, view: object, obj: object):
         """Method to check if the current
         user is a project's contributor.
@@ -89,7 +101,7 @@ class IsContributor(permissions.BasePermission):
 
         Returns:
             bool
-        """        
+        """
         contributors = Contributor.objects.filter(project=obj)
         return contributors.filter(user=request.user)
 
@@ -101,6 +113,7 @@ class IsContributorForIssue(permissions.BasePermission):
     Arguments:
         permissions -- A class BasePermission
     """
+
     def has_permission(self, request: str, view: object):
         """A method to check if current user
         is a project's contributor.
@@ -112,9 +125,9 @@ class IsContributorForIssue(permissions.BasePermission):
         Returns:
             bool
         """
-        if view.action in ['list', 'retrieve']:
+        if view.action in ["list", "retrieve"]:
             try:
-                project = Project.objects.get(id=view.kwargs['project_pk'])
+                project = Project.objects.get(id=view.kwargs["project_pk"])
             except ObjectDoesNotExist:
                 return False
             return project.contributors.filter(user=request.user)
@@ -130,7 +143,7 @@ class IsContributorForIssue(permissions.BasePermission):
 
         Returns:
             bool
-        """        
+        """
         contributors = Contributor.objects.filter(project=obj.project)
         return contributors.filter(user=request.user)
 
@@ -142,6 +155,7 @@ class IsAuthorOfIssue(permissions.BasePermission):
     Arguments:
         permissions -- A class BasePermission
     """
+
     def has_object_permission(self, request: str, view: object, obj: object):
         """Method to check if the current
         user is the author of the issue.
@@ -153,7 +167,7 @@ class IsAuthorOfIssue(permissions.BasePermission):
 
         Returns:
             bool
-        """        
+        """
         return obj.author == request.user
 
 
@@ -164,6 +178,7 @@ class IsContributorForComment(permissions.BasePermission):
     Arguments:
         permissions -- A class BasePermission
     """
+
     def has_permission(self, request: str, view: object):
         """A method to check if current user
         is a project's contributor.
@@ -175,9 +190,9 @@ class IsContributorForComment(permissions.BasePermission):
         Returns:
             bool
         """
-        if view.action in ['list', 'retrieve']:
+        if view.action in ["list", "retrieve"]:
             try:
-                project = Project.objects.get(id=view.kwargs['project_pk'])
+                project = Project.objects.get(id=view.kwargs["project_pk"])
             except ObjectDoesNotExist:
                 return False
             return project.contributors.filter(user=request.user)
@@ -193,7 +208,7 @@ class IsContributorForComment(permissions.BasePermission):
 
         Returns:
             bool
-        """        
+        """
         contributors = Contributor.objects.filter(project=obj.issue.project)
         return contributors.filter(user=request.user)
 
@@ -205,6 +220,7 @@ class IsAuthorOfComment(permissions.BasePermission):
     Arguments:
         permissions -- A class BasePermission
     """
+
     def has_object_permission(self, request: str, view: object, obj: object):
         """Method to check if the current
         user is the author of the comment.
@@ -216,5 +232,5 @@ class IsAuthorOfComment(permissions.BasePermission):
 
         Returns:
             bool
-        """        
+        """
         return obj.author == request.user

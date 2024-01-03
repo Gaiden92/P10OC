@@ -7,10 +7,13 @@ class isOwner(permissions.BasePermission):
     Arguments:
         permissions -- class BasePermission
     """
-    def has_object_permission(self,
-                              request: str,
-                              view: str,
-                              obj: object) -> bool:
+
+    def has_object_permission(
+            self,
+            request: str,
+            view: str,
+            obj: object
+    ) -> bool:
         """Method check if the user is the object's owner
 
         Arguments:

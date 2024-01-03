@@ -9,14 +9,10 @@ class ContributorSerializer(serializers.ModelSerializer):
     Arguments:
         serializers -- class ModelSerializer
     """
+
     class Meta:
         model = Contributor
-        fields = [
-            "id",
-            "created_time",
-            "user",
-            "project"
-            ]
+        fields = ["id", "created_time", "user", "project"]
 
 
 class ProjectSerializer(serializers.ModelSerializer):
@@ -27,12 +23,13 @@ class ProjectSerializer(serializers.ModelSerializer):
     Returns:
         None
     """
+
     contributors = ContributorSerializer(many=True, read_only=True)
 
     class Meta:
         model = Project
-        fields = '__all__'
-        extra_fields = 'contributors'
+        fields = "__all__"
+        extra_fields = "contributors"
         read_only_fields = ["author", "id"]
 
     def create(self, validated_data: list) -> object:
@@ -44,14 +41,14 @@ class ProjectSerializer(serializers.ModelSerializer):
         Returns:
             obj: a project object
         """
-        request = self.context.get('request', None)
+        request = self.context.get("request", None)
         if request:
             user = request.user
         project = Project(
             title=validated_data["title"],
-            description=validated_data['description'],
-            project_type=validated_data['project_type'],
-            author=user
+            description=validated_data["description"],
+            project_type=validated_data["project_type"],
+            author=user,
         )
 
         project.save()
@@ -67,6 +64,7 @@ class IssueSerializer(serializers.ModelSerializer):
     Arguments:
         serializers -- class ModelSerializer
     """
+
     class Meta:
         model = Issue
         fields = "__all__"
@@ -82,9 +80,9 @@ class IssueSerializer(serializers.ModelSerializer):
             obj: a issue object
         """
         project = Project.objects.get(
-            id=self.context['view'].kwargs['project_pk']
-            )
-        request = self.context.get('request', None)
+            id=self.context["view"].kwargs["project_pk"]
+        )
+        request = self.context.get("request", None)
         if request:
             user = request.user
         issue = Issue.objects.create(
@@ -94,8 +92,8 @@ class IssueSerializer(serializers.ModelSerializer):
             description=validated_data["description"],
             tag=validated_data["tag"],
             priority=validated_data["priority"],
-            status=validated_data['status'],
-            author=user
+            status=validated_data["status"],
+            author=user,
         )
 
         return issue
@@ -107,6 +105,7 @@ class CommentSerializer(serializers.ModelSerializer):
     Arguments:
         serializers -- class ModelSerializer
     """
+
     class Meta:
         model = Comment
         fields = "__all__"
@@ -120,14 +119,12 @@ class CommentSerializer(serializers.ModelSerializer):
         Returns:
             obj: a comment object
         """
-        issue = Issue.objects.get(id=self.context['view'].kwargs['issue_pk'])
-        request = self.context.get('request', None)
+        issue = Issue.objects.get(id=self.context["view"].kwargs["issue_pk"])
+        request = self.context.get("request", None)
         if request:
             user = request.user
         comment = Comment.objects.create(
-            text=validated_data['text'],
-            issue=issue,
-            author=user
+            text=validated_data["text"], issue=issue, author=user
         )
 
         return comment

@@ -16,6 +16,7 @@ class UserViewSet(ModelViewSet):
     Returns:
         None
     """
+
     serializer_class = UserSerializer
 
     def get_queryset(self):
@@ -32,9 +33,9 @@ class UserViewSet(ModelViewSet):
         Returns:
             list
         """
-        if self.action in ['list', 'retrieve']:
+        if self.action in ["list", "retrieve"]:
             permission_classes = [IsAuthenticated]
-        elif self.action in ['create']:
+        elif self.action in ["create"]:
             permission_classes = [AllowAny]
         else:
             permission_classes = [IsAuthenticated & isOwner]
@@ -48,4 +49,5 @@ class UserLoginAPIView(TokenObtainPairView):
     Arguments:
         TokenObtainPairView -- class
     """
+
     serializer_class = UserLoginSerializer

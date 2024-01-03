@@ -12,10 +12,9 @@ class User(AbstractUser):
     Returns:
         User
     """
+
     created_time = models.DateTimeField(auto_now_add=True)
-    age = models.IntegerField(validators=[
-        MinValueValidator(limit_value=15)
-        ])
+    age = models.IntegerField(validators=[MinValueValidator(limit_value=15)])
 
     # confidentialité et RGPD
     can_be_contacted = models.BooleanField()

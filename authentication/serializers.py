@@ -12,9 +12,10 @@ class UserSerializer(serializers.ModelSerializer):
     Returns:
         None
     """
+
     class Meta:
-        """A meta class of the serializer object. 
-        """
+        """A meta class of the serializer object."""
+
         model = User
         fields = [
             "id",
@@ -22,15 +23,16 @@ class UserSerializer(serializers.ModelSerializer):
             "password",
             "age",
             "can_be_contacted",
-            "can_data_be_shared"]
+            "can_data_be_shared",
+        ]
         extra_kwargs = {"password": {"write_only": True}}
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.instance:
-            self.fields.pop('password')
+            self.fields.pop("password")
 
-    def create(self, validated_data:tuple)->object:
+    def create(self, validated_data: tuple) -> object:
         """Method for create a User.
 
         Arguments:
@@ -51,6 +53,6 @@ class UserLoginSerializer(serializers.Serializer):
     Arguments:
         serializers -- A class Serializer
     """
+
     username = serializers.CharField()
     password = serializers.CharField(write_only=True)
-

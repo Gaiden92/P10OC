@@ -5,20 +5,28 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('api', '0012_alter_contributor_user'),
+        ("api", "0012_alter_contributor_user"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='issue',
-            name='assign_to',
-            field=models.ForeignKey(blank=True, on_delete=django.db.models.deletion.CASCADE, to='api.contributor'),
+            model_name="issue",
+            name="assign_to",
+            field=models.ForeignKey(
+                blank=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="api.contributor",
+            ),
         ),
         migrations.AlterField(
-            model_name='issue',
-            name='project',
-            field=models.ForeignKey(blank=True, on_delete=django.db.models.deletion.CASCADE, related_name='issues', to='api.project'),
+            model_name="issue",
+            name="project",
+            field=models.ForeignKey(
+                blank=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="issues",
+                to="api.project",
+            ),
         ),
     ]

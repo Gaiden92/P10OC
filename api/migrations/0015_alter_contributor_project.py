@@ -5,15 +5,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('api', '0014_alter_project_author'),
+        ("api", "0014_alter_project_author"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='contributor',
-            name='project',
-            field=models.ForeignKey(blank=True, on_delete=django.db.models.deletion.CASCADE, related_name='contributors', to='api.project'),
+            model_name="contributor",
+            name="project",
+            field=models.ForeignKey(
+                blank=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="contributors",
+                to="api.project",
+            ),
         ),
     ]

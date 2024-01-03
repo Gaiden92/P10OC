@@ -5,20 +5,26 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('api', '0015_alter_contributor_project'),
+        ("api", "0015_alter_contributor_project"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='comment',
-            name='issue',
-            field=models.ForeignKey(blank=True, on_delete=django.db.models.deletion.CASCADE, related_name='comments', to='api.issue'),
+            model_name="comment",
+            name="issue",
+            field=models.ForeignKey(
+                blank=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="comments",
+                to="api.issue",
+            ),
         ),
         migrations.AlterField(
-            model_name='comment',
-            name='link_to_issue',
-            field=models.ForeignKey(blank=True, on_delete=django.db.models.deletion.CASCADE, to='api.issue'),
+            model_name="comment",
+            name="link_to_issue",
+            field=models.ForeignKey(
+                blank=True, on_delete=django.db.models.deletion.CASCADE, to="api.issue"
+            ),
         ),
     ]

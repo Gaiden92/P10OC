@@ -2,17 +2,21 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 
 from api.models import Project, Issue, Comment, Contributor
-from api.serializers import (ProjectSerializer,
-                             IssueSerializer,
-                             CommentSerializer,
-                             ContributorSerializer)
-from api.permissions import (IsAuthor,
-                             IsAuthorOrReadOnly,
-                             IsContributor,
-                             IsContributorForIssue,
-                             IsAuthorOfIssue,
-                             IsContributorForComment,
-                             IsAuthorOfComment)
+from api.serializers import (
+    ProjectSerializer,
+    IssueSerializer,
+    CommentSerializer,
+    ContributorSerializer,
+)
+from api.permissions import (
+    IsAuthor,
+    IsAuthorOrReadOnly,
+    IsContributor,
+    IsContributorForIssue,
+    IsAuthorOfIssue,
+    IsContributorForComment,
+    IsAuthorOfComment,
+)
 
 
 class ProjectViewSet(ModelViewSet):
@@ -24,6 +28,7 @@ class ProjectViewSet(ModelViewSet):
     Returns:
         None
     """
+
     serializer_class = ProjectSerializer
 
     def get_queryset(self) -> object:
@@ -40,10 +45,13 @@ class ProjectViewSet(ModelViewSet):
         Returns:
             list
         """
-        if self.action in ['create']:
+        if self.action in ["create"]:
             permission_classes = [IsAuthenticated]
-        elif self.action in ['list', 'retrieve']:
-            permission_classes = [IsAuthenticated, IsContributor | IsAuthor,]
+        elif self.action in ["list", "retrieve"]:
+            permission_classes = [
+                IsAuthenticated,
+                IsContributor | IsAuthor,
+            ]
         else:
             permission_classes = [IsAuthor]
         return [permission() for permission in permission_classes]
@@ -58,6 +66,7 @@ class ContributorViewSet(ModelViewSet):
     Returns:
         None
     """
+
     serializer_class = ContributorSerializer
     permission_classes = [IsAuthorOrReadOnly]
 
@@ -67,7 +76,9 @@ class ContributorViewSet(ModelViewSet):
         Returns:
             object: queryset containing all contributors
         """
-        contributors = Contributor.objects.filter(project=self.kwargs['project_pk'])
+        contributors = Contributor.objects.filter(
+            project=self.kwargs["project_pk"]
+            )
         return contributors
 
 
@@ -80,6 +91,7 @@ class IssueViewSet(ModelViewSet):
     Returns:
         None
     """
+
     serializer_class = IssueSerializer
 
     def get_permissions(self) -> list:
@@ -88,8 +100,10 @@ class IssueViewSet(ModelViewSet):
         Returns:
             list
         """
-        if self.action in ['list', 'retrieve', 'create']:
-            permission_classes = [IsAuthenticated & IsContributorForIssue,]
+        if self.action in ["list", "retrieve", "create"]:
+            permission_classes = [
+                IsAuthenticated & IsContributorForIssue,
+            ]
         else:
             permission_classes = [IsAuthorOfIssue]
 
@@ -101,7 +115,7 @@ class IssueViewSet(ModelViewSet):
         Returns:
             object: queryset containing all issues
         """
-        issues = Issue.objects.filter(project=self.kwargs['project_pk'])
+        issues = Issue.objects.filter(project=self.kwargs["project_pk"])
         return issues
 
 
@@ -114,6 +128,7 @@ class CommentViewSet(ModelViewSet):
     Returns:
         None
     """
+
     serializer_class = CommentSerializer
 
     def get_queryset(self) -> object:
@@ -122,9 +137,8 @@ class CommentViewSet(ModelViewSet):
         Returns:
             object: queryset containing all comments
         """
-        comments = Comment.objects.filter(issue=self.kwargs['issue_pk'])
+        comments = Comment.objects.filter(issue=self.kwargs["issue_pk"])
         return comments
-
 
     def get_permissions(self) -> list:
         """Method to give permission to user
@@ -132,8 +146,10 @@ class CommentViewSet(ModelViewSet):
         Returns:
             list
         """
-        if self.action in ['list', 'retrieve', 'create']:
-            permission_classes = [IsAuthenticated & IsContributorForComment,]
+        if self.action in ["list", "retrieve", "create"]:
+            permission_classes = [
+                IsAuthenticated & IsContributorForComment,
+            ]
         else:
             permission_classes = [IsAuthenticated & IsAuthorOfComment]
 

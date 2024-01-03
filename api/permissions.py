@@ -1,26 +1,21 @@
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import permissions
-from .models import Project
+
+from .models import Project, Contributor
 
 
 class IsAuthor(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        if request.method in permissions.SAFE_METHODS:
-            #Vérifie si l'utilisateur est un contributeur au projet
-            if request.user in obj.contributors:
-                return True
-            else:
-                return False
-        # Vérifie si l'utilisateur est l'auteur de l'objet
         return obj.author == request.user
 
 
 class IsAuthorOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
         # Autoriser les requêtes GET, HEAD ou OPTIONS
-        if request.method in permissions.SAFE_METHODS and request.user.is_authenticated:
+        if request.method in (permissions.SAFE_METHODS and
+                              request.user.is_authenticated):
             return True
 
-        # Autoriser les requêtes POST, PUT, PATCH ou DELETE seulement pour les auteurs du projet
         project_pk = request.data.get('project', None)
         if project_pk:
             project = Project.objects.get(pk=project_pk)
@@ -29,6 +24,48 @@ class IsAuthorOrReadOnly(permissions.BasePermission):
         return False
 
     def has_object_permission(self, request, view, obj):
-        # Seul l'auteur du projet peut effectuer des opérations sur les contributeurs
         return obj.project.author == request.user
 
+
+class IsContributor(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        contributors = Contributor.objects.filter(project=obj)
+        return contributors.filter(user=request.user)
+
+
+class IsContributorForIssue(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if view.action in ['list', 'retrieve']:
+            try:
+                project = Project.objects.get(id=view.kwargs['project_pk'])
+            except ObjectDoesNotExist:
+                return False
+            return project.contributors.filter(user=request.user)
+
+    def has_object_permission(self, request, view, obj):
+        contributors = Contributor.objects.filter(project=obj.project)
+        return contributors.filter(user=request.user)
+
+
+class IsAuthorOfIssue(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.author == request.user
+
+
+class IsContributorForComment(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if view.action in ['list', 'retrieve']:
+            try:
+                project = Project.objects.get(id=view.kwargs['project_pk'])
+            except ObjectDoesNotExist:
+                return False
+            return project.contributors.filter(user=request.user)
+
+    def has_object_permission(self, request, view, obj):
+        contributors = Contributor.objects.filter(project=obj.issue.project)
+        return contributors.filter(user=request.user)
+
+
+class IsAuthorOfComment(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.author == request.user

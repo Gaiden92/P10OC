@@ -55,14 +55,17 @@ class IsAuthorOrReadOnly(permissions.BasePermission):
         Returns:
             bool
         """
-        if request.method in permissions.SAFE_METHODS \
-                and request.user.is_authenticated:
-            return True
-
-        project_pk = request.data.get("project", None)
-        if project_pk:
-            project = Project.objects.get(pk=project_pk)
-            return project.author == request.user
+        try:
+            project = Project.objects.get(id=view.kwargs["project_pk"])
+        except ObjectDoesNotExist:
+            return False
+        if project:
+            contributors = Contributor.objects.filter(project=project)
+            if request.method in permissions.SAFE_METHODS \
+                    and request.user.is_authenticated and contributors.filter(user=request.user):
+                return True
+            else:
+                return project.author == request.user
 
         return False
 
@@ -78,7 +81,7 @@ class IsAuthorOrReadOnly(permissions.BasePermission):
         Returns:
             bool
         """
-
+        
         return obj.project.author == request.user
 
 
@@ -125,27 +128,12 @@ class IsContributorForIssue(permissions.BasePermission):
         Returns:
             bool
         """
-        if view.action in ["list", "retrieve"]:
-            try:
-                project = Project.objects.get(id=view.kwargs["project_pk"])
-            except ObjectDoesNotExist:
-                return False
-            return project.contributors.filter(user=request.user)
 
-    def has_object_permission(self, request: str, view: object, obj: object):
-        """Method to check if the current
-        user is a project's contributor.
-
-        Arguments:
-            request -- str: a request
-            view -- str: a view
-            obj -- object: an object
-
-        Returns:
-            bool
-        """
-        contributors = Contributor.objects.filter(project=obj.project)
-        return contributors.filter(user=request.user)
+        try:
+            project = Project.objects.get(id=view.kwargs["project_pk"])
+        except ObjectDoesNotExist:
+            return False
+        return project.contributors.filter(user=request.user)
 
 
 class IsAuthorOfIssue(permissions.BasePermission):
@@ -190,12 +178,12 @@ class IsContributorForComment(permissions.BasePermission):
         Returns:
             bool
         """
-        if view.action in ["list", "retrieve"]:
-            try:
-                project = Project.objects.get(id=view.kwargs["project_pk"])
-            except ObjectDoesNotExist:
-                return False
-            return project.contributors.filter(user=request.user)
+
+        try:
+            project = Project.objects.get(id=view.kwargs["project_pk"])
+        except ObjectDoesNotExist:
+            return False
+        return project.contributors.filter(user=request.user)
 
     def has_object_permission(self, request: str, view: object, obj: object):
         """Method to check if the current

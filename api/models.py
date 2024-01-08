@@ -23,7 +23,7 @@ class Project(models.Model):
 
     created_time = models.DateTimeField(auto_now_add=True)
     title = models.CharField(max_length=65)
-    description = models.TextField()
+    description = models.TextField(max_length=365)
     project_type = models.CharField(max_length=65, choices=choices)
 
     author = models.ForeignKey(
@@ -90,7 +90,6 @@ class Issue(models.Model):
         ("IN_PROGRESS", "In progress"),
         ("FINISHED", "Finished"),
     )
-
     created_time = models.DateTimeField(auto_now_add=True)
     title = models.CharField(max_length=255)
     description = models.TextField()
@@ -110,7 +109,6 @@ class Issue(models.Model):
     assign_to = models.ForeignKey(
         Contributor,
         on_delete=models.CASCADE,
-        blank=True
     )
     author = models.ForeignKey(
         AUTH_USER_MODEL,

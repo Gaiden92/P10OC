@@ -3,7 +3,8 @@ from rest_framework.permissions import IsAuthenticated
 
 from api.models import Project, Issue, Comment, Contributor
 from api.serializers import (
-    ProjectSerializer,
+    ProjectListSerializer,
+    ProjectDetailSerializer,
     IssueSerializer,
     CommentSerializer,
     ContributorSerializer,
@@ -29,7 +30,8 @@ class ProjectViewSet(ModelViewSet):
         None
     """
 
-    serializer_class = ProjectSerializer
+    serializer_class = ProjectListSerializer
+    detail_serializer_class = ProjectDetailSerializer
 
     def get_queryset(self) -> object:
         """Method to get all the project of the database.
@@ -38,6 +40,11 @@ class ProjectViewSet(ModelViewSet):
             object: queryset containing all projects
         """
         return Project.objects.all()
+
+    def get_serializer_class(self):
+        if not self.action == "list":
+            return self.detail_serializer_class
+        return super().get_serializer_class()
 
     def get_permissions(self) -> list:
         """Method to give permission to user
@@ -102,7 +109,7 @@ class IssueViewSet(ModelViewSet):
         """
         if self.action in ["list", "retrieve", "create"]:
             permission_classes = [
-                IsAuthenticated & IsContributorForIssue,
+                IsAuthenticated & IsContributorForIssue
             ]
         else:
             permission_classes = [IsAuthorOfIssue]
@@ -148,9 +155,9 @@ class CommentViewSet(ModelViewSet):
         """
         if self.action in ["list", "retrieve", "create"]:
             permission_classes = [
-                IsAuthenticated & IsContributorForComment,
+                IsContributorForComment,
             ]
         else:
-            permission_classes = [IsAuthenticated & IsAuthorOfComment]
+            permission_classes = [IsAuthorOfComment]
 
         return [permission() for permission in permission_classes]

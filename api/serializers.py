@@ -114,8 +114,63 @@ class ProjectDetailSerializer(serializers.ModelSerializer):
         return project
 
 
-class IssueSerializer(serializers.ModelSerializer):
-    """A class representation of a issue serializer.
+class IssueListSerializer(serializers.ModelSerializer):
+    """A class representation of a issue list serializer.
+
+    Arguments:
+        serializers -- class ModelSerializer
+    """
+
+    class Meta:
+        model = Issue
+        fields = "__all__"
+        read_only_fields = ["author", "id"]
+        extra_kwargs = {
+            "title": {"write_only": True},
+            "description": {"write_only": True},
+            "project": {"write_only": True},
+            "priority": {"write_only": True},
+            "tag": {"write_only": True},
+            "status": {"write_only": True},
+        }
+
+    def create(self, validated_data: list) -> object:
+        """Method to create a issue instance.
+
+        Arguments:
+            validated_data -- list: data
+
+        Returns:
+            obj: a issue object
+        """
+        project = Project.objects.get(
+            id=self.context["view"].kwargs["project_pk"]
+        )
+        request = self.context.get("request", None)
+        if request:
+            user = request.user
+
+        # vérification de l'assignation à un contributeur
+        if "assign_to" in validated_data:
+            contributor = validated_data['assign_to']
+            if contributor.project != project:
+                    raise serializers.ValidationError("Le contributeur n'appartient pas au projet.")
+        
+        issue = Issue.objects.create(
+            assign_to=contributor,
+            project=project,
+            title=validated_data["title"],
+            description=validated_data["description"],
+            tag=validated_data["tag"],
+            priority=validated_data["priority"],
+            status=validated_data["status"],
+            author=user,
+        )
+
+        return issue
+
+class IssueDetailSerializer(serializers.ModelSerializer):
+    """A class representation of a issue detail serializer.
 
     Arguments:
         serializers -- class ModelSerializer
@@ -161,9 +216,43 @@ class IssueSerializer(serializers.ModelSerializer):
 
         return issue
 
+class CommentListSerializer(serializers.ModelSerializer):
+    """A class representation of a comment serializer.
+
+    Arguments:
+        serializers -- class ModelSerializer
+    """
+
+    class Meta:
+        model = Comment
+        fields = "__all__"
+        read_only_fields = ['id', "author", "uuid"]
+        extra_kwargs = {
+            "text": {"write_only": True},
+            "issue": {"write_only": True},
+        }
+
+    def create(self, validated_data: list) -> object:
+        """Method to create a comment instance.
+
+        Arguments:
+            validated_data -- list: data
+
+        Returns:
+            obj: a comment object
+        """
+        issue = Issue.objects.get(id=self.context["view"].kwargs["issue_pk"])
+        request = self.context.get("request", None)
+        if request:
+            user = request.user
+        comment = Comment.objects.create(
+            text=validated_data["text"], issue=issue, author=user
+        )
+
+        return comment
 
 
-class CommentSerializer(serializers.ModelSerializer):
+class CommentDetailSerializer(serializers.ModelSerializer):
     """A class representation of a comment serializer.
 
     Arguments:

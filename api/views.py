@@ -5,14 +5,17 @@ from api.models import Project, Issue, Comment, Contributor
 from api.serializers import (
     ProjectListSerializer,
     ProjectDetailSerializer,
-    IssueSerializer,
-    CommentSerializer,
+    IssueListSerializer,
+    IssueDetailSerializer,
+    CommentListSerializer,
+    CommentDetailSerializer,
     ContributorSerializer,
 )
 from api.permissions import (
     IsAuthor,
-    IsAuthorOrReadOnly,
     IsContributor,
+    IsContributorForContributor,
+    isAuthorForContributor,
     IsContributorForIssue,
     IsAuthorOfIssue,
     IsContributorForComment,
@@ -75,7 +78,6 @@ class ContributorViewSet(ModelViewSet):
     """
 
     serializer_class = ContributorSerializer
-    permission_classes = [IsAuthorOrReadOnly]
 
     def get_queryset(self) -> object:
         """Method to get all the project's contributors.
@@ -88,6 +90,14 @@ class ContributorViewSet(ModelViewSet):
             )
         return contributors
 
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            permissions_classes = [IsContributorForContributor]
+        else:
+            permissions_classes = [isAuthorForContributor]
+
+        return [permission() for permission in permissions_classes]
+
 
 class IssueViewSet(ModelViewSet):
     """A class representation of a issue.
@@ -99,7 +109,8 @@ class IssueViewSet(ModelViewSet):
         None
     """
 
-    serializer_class = IssueSerializer
+    serializer_class = IssueListSerializer
+    detail_serializer_class = IssueDetailSerializer
 
     def get_permissions(self) -> list:
         """Method to give permission to user
@@ -115,6 +126,11 @@ class IssueViewSet(ModelViewSet):
             permission_classes = [IsAuthorOfIssue]
 
         return [permission() for permission in permission_classes]
+
+    def get_serializer_class(self):
+            if not self.action == "list":
+                return self.detail_serializer_class
+            return super().get_serializer_class()
 
     def get_queryset(self) -> object:
         """Method to get all the project's issues.
@@ -136,7 +152,8 @@ class CommentViewSet(ModelViewSet):
         None
     """
 
-    serializer_class = CommentSerializer
+    serializer_class = CommentListSerializer
+    detail_serializer_class = CommentDetailSerializer
 
     def get_queryset(self) -> object:
         """Method to get all the issue's comments.
@@ -147,6 +164,11 @@ class CommentViewSet(ModelViewSet):
         comments = Comment.objects.filter(issue=self.kwargs["issue_pk"])
         return comments
 
+    def get_serializer_class(self):
+            if not self.action == "list":
+                return self.detail_serializer_class
+            return super().get_serializer_class()
+
     def get_permissions(self) -> list:
         """Method to give permission to user
 
@@ -155,7 +177,7 @@ class CommentViewSet(ModelViewSet):
         """
         if self.action in ["list", "retrieve", "create"]:
             permission_classes = [
-                IsContributorForComment,
+                IsAuthenticated & IsContributorForComment
             ]
         else:
             permission_classes = [IsAuthorOfComment]

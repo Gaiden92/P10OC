@@ -24,4 +24,5 @@ class isOwner(permissions.BasePermission):
         Returns:
             bool
         """
+        print("hello")
         return request.user == obj

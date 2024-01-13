@@ -31,26 +31,20 @@ class IsAuthor(permissions.BasePermission):
         """
         return obj.author == request.user
 
-
-class IsAuthorOrReadOnly(permissions.BasePermission):
-    """A class that represents a permission to check if current user
-        is the author of the project.
+class IsContributorForContributor(permissions.BasePermission):
+    """A class thats represents autorization to the contributor of a project
+    for the contributors ressource. 
 
     Arguments:
-        permissions -- A class BasePermission
+        permissions -- a BasePermission class
     """
-
-    def has_permission(
-            self,
-            request: str,
-            view: object
-    ) -> bool:
-        """A method to check if current user
-        is the author of the project.
+    def has_permission(self, request: str, view: str):
+        """Method to check if the user is the author of the project
+        for post method and contributor for other methods.
 
         Arguments:
             request -- str: a request
-            view -- obj: a view
+            view -- str: a view
 
         Returns:
             bool
@@ -61,28 +55,48 @@ class IsAuthorOrReadOnly(permissions.BasePermission):
             return False
         if project:
             contributors = Contributor.objects.filter(project=project)
-            if request.method in permissions.SAFE_METHODS \
-                    and request.user.is_authenticated and contributors.filter(user=request.user):
+            if request.method in permissions.SAFE_METHODS\
+                and request.user.is_authenticated\
+                and contributors.filter(user=request.user):
+                return True
+            elif request.method == 'POST'\
+                and request.user.is_authenticated\
+                and project.author == request.user:
                 return True
             else:
-                return project.author == request.user
-
+                return False
         return False
+    
 
-    def has_object_permission(self, request: str, view: object, obj: object):
-        """Method to check if the current
-        user is the author of the project.
+class isAuthorForContributor(permissions.BasePermission):
+    """A class thats represents autorization to the author of a project
+    for the contributors ressource. 
+
+    Arguments:
+        permissions -- a BasePermission class
+    """
+    def has_permission(self, request: str, view: str):
+        """Method to check if the user is the author of the project
+        for post, update or delete a contributor.
 
         Arguments:
             request -- str: a request
             view -- str: a view
-            obj -- object: an object
 
         Returns:
             bool
         """
-        
-        return obj.project.author == request.user
+        try:
+            project = Project.objects.get(id=view.kwargs["project_pk"])
+        except ObjectDoesNotExist:
+            return False
+        if project:
+            if request.method in ['POST', 'DELETE', 'UPDATE' ]\
+                and request.user.is_authenticated\
+                and project.author == request.user:
+                return True
+        return False
+
 
 
 class IsContributor(permissions.BasePermission):
@@ -178,12 +192,13 @@ class IsContributorForComment(permissions.BasePermission):
         Returns:
             bool
         """
-
+        
         try:
             project = Project.objects.get(id=view.kwargs["project_pk"])
         except ObjectDoesNotExist:
             return False
-        return project.contributors.filter(user=request.user)
+        contributors = Contributor.objects.filter(project=project)
+        return contributors.filter(user=request.user)
 
     def has_object_permission(self, request: str, view: object, obj: object):
         """Method to check if the current
@@ -197,7 +212,11 @@ class IsContributorForComment(permissions.BasePermission):
         Returns:
             bool
         """
-        contributors = Contributor.objects.filter(project=obj.issue.project)
+        try:
+            project = Project.objects.get(id=view.kwargs["project_pk"])
+        except ObjectDoesNotExist:
+            return False
+        contributors = Contributor.objects.filter(project=project)
         return contributors.filter(user=request.user)
 
 

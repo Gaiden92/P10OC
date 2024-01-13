@@ -155,4 +155,4 @@ class Comment(models.Model):
         Returns:
             str: the comment's uuid
         """
-        return self.uuid
+        return str(self.uuid)
